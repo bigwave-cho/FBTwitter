@@ -9,7 +9,7 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import Tweet from 'components/Tweet';
-import { ref, uploadString } from 'firebase/storage';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 // npm install uuid 식별자 랜던 생성
 
@@ -42,21 +42,24 @@ const Home = ({ userObj }) => {
   //https://firebase.google.com/docs/storage/web/upload-files?hl=ko
   const onSubmit = async (e) => {
     e.preventDefault();
-    const fileRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
-    //ref(db, child)  child로 폴더 & ID 설정
+    let attachmentUrl = '';
+    if (attachment !== '') {
+      const attachmentRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
+      //ref(db, child)  child로 폴더 & ID 설정
 
-    const response = await uploadString(fileRef, attachment, 'data_url');
-    console.log(response);
-    // try {
-    //   await addDoc(collection(dbService, 'tweets'), {
-    //     text: tweet,
-    //     createdAt: Date.now(),
-    //     creatorId: userObj.uid,
-    //   });
-    //   setTweet('');
-    // } catch (err) {
-    //   console.log(err.message);
-    // }
+      await uploadString(attachmentRef, attachment, 'data_url');
+
+      attachmentUrl = await getDownloadURL(attachmentRef); // fileURL 반환
+    }
+    const newTweet = {
+      text: tweet,
+      createdAt: Date.now(),
+      creatorId: userObj.uid,
+      attachmentUrl,
+    };
+    await addDoc(collection(dbService, 'tweets'), newTweet);
+    setTweet('');
+    setAttachment('');
   };
   const onChange = (e) => {
     const {

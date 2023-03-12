@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -18,10 +19,4 @@ export const authService = getAuth(app);
 
 export const dbService = getFirestore(app);
 
-/*
-firestore
-https://firebase.google.com/docs/firestore/quickstart?hl=ko#web-version-9
-
-collection : 폴더 (집합)
-document : 문서   (ID)
-*/
+export const storageService = getStorage();

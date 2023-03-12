@@ -1,4 +1,4 @@
-import { dbService } from 'fbase';
+import { dbService, storageService } from 'fbase';
 import { useEffect, useState } from 'react';
 import {
   collection,
@@ -9,6 +9,9 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import Tweet from 'components/Tweet';
+import { ref, uploadString } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
+// npm install uuid 식별자 랜던 생성
 
 const Home = ({ userObj }) => {
   const [tweet, setTweet] = useState('');
@@ -36,18 +39,24 @@ const Home = ({ userObj }) => {
     });
   }, []);
 
+  //https://firebase.google.com/docs/storage/web/upload-files?hl=ko
   const onSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await addDoc(collection(dbService, 'tweets'), {
-        text: tweet,
-        createdAt: Date.now(),
-        creatorId: userObj.uid,
-      });
-      setTweet('');
-    } catch (err) {
-      console.log(err.message);
-    }
+    const fileRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
+    //ref(db, child)  child로 폴더 & ID 설정
+
+    const response = await uploadString(fileRef, attachment, 'data_url');
+    console.log(response);
+    // try {
+    //   await addDoc(collection(dbService, 'tweets'), {
+    //     text: tweet,
+    //     createdAt: Date.now(),
+    //     creatorId: userObj.uid,
+    //   });
+    //   setTweet('');
+    // } catch (err) {
+    //   console.log(err.message);
+    // }
   };
   const onChange = (e) => {
     const {
@@ -56,18 +65,15 @@ const Home = ({ userObj }) => {
     setTweet(value);
   };
 
-  //[FileReader API]
-  //https://developer.mozilla.org/ko/docs/Web/API/FileReader
-  //https://developer.mozilla.org/en-US/docs/Web/API/FileReader/onload
   const onFileChange = (e) => {
     const {
       target: { files },
     } = e;
-    const theFile = files[0]; //파일을 가져와서
-    const reader = new FileReader(); // 리더를 만들고
+    const theFile = files[0];
+    const reader = new FileReader();
     reader.onload = (finishedEvent) =>
-      setAttachment(finishedEvent.currentTarget.result); // onload되면 콜백실행
-    reader.readAsDataURL(theFile); // DataURL로 파일 읽기
+      setAttachment(finishedEvent.currentTarget.result);
+    reader.readAsDataURL(theFile);
   };
   const onClearAttachment = () => setAttachment(null);
   return (

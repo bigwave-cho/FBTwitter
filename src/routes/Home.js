@@ -1,8 +1,15 @@
 import { dbService } from 'fbase';
 import { useEffect, useState } from 'react';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  orderBy,
+} from 'firebase/firestore';
 
-const Home = () => {
+const Home = ({ userObj }) => {
   const [tweet, setTweet] = useState('');
   const [tweets, setTweets] = useState([]);
 
@@ -16,15 +23,24 @@ const Home = () => {
 
   useEffect(() => {
     getTweets();
+    const q = query(collection(dbService, 'tweets'), orderBy('createdAt'));
+    onSnapshot(q, (snapshot) => {
+      // forEach 보다 효율적.
+      const tweetArray = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setTweets(tweetArray);
+    });
   }, []);
-  console.log(tweets);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const docRec = await addDoc(collection(dbService, 'tweets'), {
-        tweet,
+      await addDoc(collection(dbService, 'tweets'), {
+        text: tweet,
         createdAt: Date.now(),
+        creatorId: userObj.uid,
       });
       setTweet('');
     } catch (err) {
@@ -50,9 +66,9 @@ const Home = () => {
         <input type="submit" value="tweet" />
       </form>
       <div>
-        {tweets.map((tweet) => (
-          <div key={tweet.id}>
-            <h4>{tweet.tweet}</h4>
+        {tweets.map((tweet, i) => (
+          <div key={tweet.id + i}>
+            <h4>{tweet.text}</h4>
           </div>
         ))}
       </div>

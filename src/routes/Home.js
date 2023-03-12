@@ -13,6 +13,7 @@ import Tweet from 'components/Tweet';
 const Home = ({ userObj }) => {
   const [tweet, setTweet] = useState('');
   const [tweets, setTweets] = useState([]);
+  const [attachment, setAttachment] = useState();
 
   const getTweets = async () => {
     const dbTweets = await getDocs(collection(dbService, 'tweets'));
@@ -54,6 +55,21 @@ const Home = ({ userObj }) => {
     } = e;
     setTweet(value);
   };
+
+  //[FileReader API]
+  //https://developer.mozilla.org/ko/docs/Web/API/FileReader
+  //https://developer.mozilla.org/en-US/docs/Web/API/FileReader/onload
+  const onFileChange = (e) => {
+    const {
+      target: { files },
+    } = e;
+    const theFile = files[0]; //파일을 가져와서
+    const reader = new FileReader(); // 리더를 만들고
+    reader.onload = (finishedEvent) =>
+      setAttachment(finishedEvent.currentTarget.result); // onload되면 콜백실행
+    reader.readAsDataURL(theFile); // DataURL로 파일 읽기
+  };
+  const onClearAttachment = () => setAttachment(null);
   return (
     <div>
       <form onSubmit={onSubmit}>
@@ -64,7 +80,14 @@ const Home = ({ userObj }) => {
           placeholder="What' on your mind?"
           maxLength={120}
         />
+        <input type="file" accept="image/*" onChange={onFileChange} />
         <input type="submit" value="tweet" />
+        {attachment && (
+          <div>
+            <img src={attachment} width="50px" height={50} alt="img" />
+            <button onClick={onClearAttachment}>Clear</button>
+          </div>
+        )}
       </form>
       <div>
         {tweets.map((tweet) => (

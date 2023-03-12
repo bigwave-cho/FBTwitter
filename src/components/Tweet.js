@@ -1,6 +1,7 @@
-import { dbService } from 'fbase';
+import { dbService, storageService } from 'fbase';
 import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { useState } from 'react';
+import { deleteObject, ref } from 'firebase/storage';
 const Tweet = ({ tweetObj, isOwner }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newTweet, setNewTweet] = useState(tweetObj.text);
@@ -20,17 +21,25 @@ const Tweet = ({ tweetObj, isOwner }) => {
     } = e;
     setNewTweet(value);
   };
-  //삭제
+  //삭제 // docu + file 삭제
+  //https://firebase.google.com/docs/storage/web/delete-files?hl=ko
   const onDeleteClick = async () => {
     const ok = window.confirm('Are you sure you want to delete this tweet?');
     if (ok) {
-      const tweetRef = doc(dbService, 'tweets', tweetObj.id);
-      await deleteDoc(tweetRef);
+      try {
+        const tweetRef = doc(dbService, 'tweets', tweetObj.id);
+        await deleteDoc(tweetRef);
+        const fileRef = ref(storageService, tweetObj.attachmentUrl);
+        if (tweetObj.attachmentUrl !== '') {
+          await deleteObject(fileRef);
+        }
+      } catch (err) {
+        console.log('실패');
+      }
     }
   };
   return (
     <div>
-      <h4>{tweetObj.text}</h4>
       {isEditing ? (
         <>
           <form onSubmit={onSubmit}>

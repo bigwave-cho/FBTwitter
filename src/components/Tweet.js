@@ -15,6 +15,7 @@ const Tweet = ({ tweetObj, isOwner }) => {
     });
     setIsEditing(false);
   };
+
   const onChange = (e) => {
     const {
       target: { value },

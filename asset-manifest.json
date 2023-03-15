@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/FBTwitter/static/css/main.74e135b0.css",
+    "main.js": "/FBTwitter/static/js/main.cc31bb20.js",
+    "index.html": "/FBTwitter/index.html",
+    "main.74e135b0.css.map": "/FBTwitter/static/css/main.74e135b0.css.map",
+    "main.cc31bb20.js.map": "/FBTwitter/static/js/main.cc31bb20.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.74e135b0.css",
+    "static/js/main.cc31bb20.js"
+  ]
+}

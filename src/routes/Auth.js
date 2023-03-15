@@ -5,6 +5,12 @@ import {
   GoogleAuthProvider,
 } from 'firebase/auth';
 import AuthForm from 'components/AuthForm';
+import {
+  faGithub,
+  faGoogle,
+  faTwitter,
+} from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const Auth = () => {
   //https://firebase.google.com/docs/auth/web/google-signin?hl=ko
@@ -24,14 +30,26 @@ const Auth = () => {
   };
 
   return (
-    <div>
+    <div className="authContainer">
+      <FontAwesomeIcon
+        icon={faTwitter}
+        style={{
+          width: '50px',
+          height: '50px',
+          position: 'relative',
+          top: '-20px',
+          color: '#04A9FF',
+        }}
+      />
       <AuthForm />
-      <div>
-        <button onClick={onSocialClick} name="google">
+      <div className="authBtns">
+        <button className="authBtn" onClick={onSocialClick} name="google">
           Continue with Google
+          <FontAwesomeIcon icon={faGoogle} />
         </button>
-        <button onClick={onSocialClick} name="github">
+        <button className="authBtn" onClick={onSocialClick} name="github">
           Continue with Github
+          <FontAwesomeIcon icon={faGithub} />
         </button>
       </div>
     </div>

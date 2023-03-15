@@ -1,3 +1,5 @@
+import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { dbService, storageService } from 'fbase';
 import { addDoc, collection } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadString } from 'firebase/storage';
@@ -9,6 +11,7 @@ const TweetFactory = ({ userObj }) => {
   const [attachment, setAttachment] = useState();
   //https://firebase.google.com/docs/storage/web/upload-files?hl=ko
   const onSubmit = async (e) => {
+    if (tweet === '') return;
     e.preventDefault();
     let attachmentUrl = '';
     if (attachment !== '') {
@@ -46,22 +49,49 @@ const TweetFactory = ({ userObj }) => {
       setAttachment(finishedEvent.currentTarget.result);
     reader.readAsDataURL(theFile);
   };
-  const onClearAttachment = () => setAttachment(null);
+  const onClearAttachment = () => setAttachment('');
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={onSubmit} className="factoryForm">
+      <div className="factoryInput__container">
+        <input
+          className="factoryInput__input"
+          value={tweet}
+          onChange={onChange}
+          type="text"
+          placeholder="What' on your mind?"
+          maxLength={120}
+        />
+        <input type="submit" value="tweet" className="factoryInput__arrow" />
+      </div>
+      <label for="attach-file" className="factoryInput__label">
+        Add Photos
+        <FontAwesomeIcon style={{ marginLeft: '10' }} icon={faPlus} />
+      </label>
       <input
-        value={tweet}
-        onChange={onChange}
-        type="text"
-        placeholder="What' on your mind?"
-        maxLength={120}
+        id="attach-file"
+        type="file"
+        accept="image/*"
+        onChange={onFileChange}
+        style={{
+          opacity: 0,
+        }}
       />
-      <input type="file" accept="image/*" onChange={onFileChange} />
-      <input type="submit" value="tweet" />
+
       {attachment && (
-        <div>
-          <img src={attachment} width="50px" height={50} alt="img" />
-          <button onClick={onClearAttachment}>Clear</button>
+        <div className="factoryForm__attachment">
+          <img
+            src={attachment}
+            style={{
+              backgroundImage: attachment,
+            }}
+            width="50px"
+            height={50}
+            alt="img"
+          />
+          <div className="factoryForm__clear" onClick={onClearAttachment}>
+            <span>Remove</span>
+            <FontAwesomeIcon icon={faTimes} />
+          </div>
         </div>
       )}
     </form>

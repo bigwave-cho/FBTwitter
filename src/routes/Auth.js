@@ -26,7 +26,6 @@ const Auth = () => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-
     try {
       let data;
       if (newAccount) {
